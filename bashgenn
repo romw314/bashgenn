@@ -82,6 +82,7 @@ while read cmd p1 p2; do
 
 		# Compiler directives
 		_MSG) [ -n "$p2" ] && p2=" $p2"; echom "_MSG: '$p1$p2'";;
+		_WARN) [ -n "$p2" ] && p2=" $p2"; warn "_MSG: '$p1$p2'";;
 		_ERR) [ -n "$p2" ] && p2=" $p2"; error "_ERR: '$p1$p2'";;
 		_OPT) BASHGENN="${BASHGENN/\[$p1=*\]/""}" && BASHGENN="$BASHGENN[$p1=$p2]";;
 
