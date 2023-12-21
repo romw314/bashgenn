@@ -25,7 +25,8 @@ CONST="dd6bashgennCONST_STORECONST_IN_BASHGENN_TO_ebf00ddf_933f_464f_a18f_f08c81
 echo "Initializing bg-f..."
 true >bg-f
 ebgf() { echo "$@" >>"bg-f"; }
-ireq() { [[ "$BASHGENN" == *"[ireq=true]"* ]] && ebgf "$@" || error "line $line: IReq is not enabled"; }
+check_ireq() { [[ "$BASHGENN" == *"[ireq=true]"* ]] || error "line $line: IReq is not enabled"; }
+ireq() { check_ireq && ebgf "$@"; }
 vars() {
 	FIRST="echo \"\${VR_$p1:0:1}\" && VR_$p1=\"\${VR_$p1:1}\""
 	LAST="echo \"\${VR_$p1:\$((\${#VR_$p1}-1)):1}\" && VR_$p1=\"\${VR_$p1:0:\$((\${#VR_$p1}-1))}\""
@@ -34,20 +35,66 @@ vars() {
 	STRRANGE="while test \$(printf %d \"'\${VR_$p1}\") -gt \$(printf %d \"'\${VR_$p2}\"); do"
 }
 
+nostrict() {
+	if  [[ "$BASHGENN" != *"[strict=none]"* ]]; then
+		[[ "$BASHGENN" == *"[strict=warn]"* ]] && local type=warn || local type=error
+		"$type" "$@"
+	fi
+}
+
+# Configuration
+config_find() {
+	local config=""
+	echo -n "Finding configuration at $1..."
+	[ -r "$1" ] && local config="$1"
+	if [ -z "$config" ]; then
+		echo " ERR"
+		return 1
+	fi
+	echo " OK"
+	BASHGENN_CONFIG="$config"
+}
+configurate() {
+	case "$1" in
+		env) echo -n "Configuring from $BASHGENN_CONFIG..." && local data="$(cat "$BASHGENN_CONFIG")";;
+		default) echo -n "Configuring with the default options..." && local data="$config_default";;
+	esac
+	local data="${data/ /}"
+	local data="${data/	/}"
+	local data="${data/(-*-)/}"
+	BASHGENN="$data"
+	echo " OK"
+}
+readonly config_default="\
+[strict=warn]
+[ireq=false]
+"
+if [ -n "$BASHGENN_CONFIG" ] || \
+	config_find "./.bgconf" || \
+	config_find "$HOME/.bashgenn/bgconf" || \
+	config_find "/etc/bashgenn/bgconf"; then
+	configurate env
+else
+	configurate default
+fi
+
+[ -n "$BDEBUG$DEBUG" ] && printf "[ DEBUG ] Config: \n%s" "$BASHGENN"
+
+# Shebang
 ebgf "#!$(which env) -S bash"
 
 line=0
 while read cmd p1 p2; do
 	let line++
-	[ "${cmd:0:1}" = "_" ] || echo "Processing $cmd at line $line..."
-	if [[ "$cmd" != "CONST_SET" ]]; then
-		if  [[ "$BASHGENN" != *"[strict=none]"* ]]; then
-			if test -n "$(echo "$cmd $p1 $p2" | tr -d 'a-zA-Z0-9_ ')"; then
-				[[ "$BASHGENN" == *"[strict=warn]"* ]] && type=warn || type=error
-				"$type" "line $line: command contains invalid characters"
-			fi
-		fi
-	fi
+	[ -z "$cmd$p1$p2" ] && continue
+	[ "${cmd:0:1}" = "_" -o "${cmd:0:1}" = "-" ] || echo "Processing $cmd at line $line..."
+	case "$cmd" in
+		CONST_SET|CONSTSET|-*) ;;
+		*)
+			if test -n "$(echo "$cmd $p1 $p2" | tr -d ' a-zA-Z0-9_-')"; then
+				nostrict "line $line: command contains invalid characters"
+			fi;;
+	esac
 	vars
 	case "$cmd" in
 		# Runtime commands
@@ -78,13 +125,17 @@ while read cmd p1 p2; do
 
 		# IReq runtime commands
 		RREPT) ireq "for To$(date +%N) in \$(seq 1 1 \${VR_$p1});do";;
-		CONST_COPY|CONSTCOPY) ireq "VR_$p1=\"\${$CONST$p1}\"";;
+		CONST_COPY|CONSTCOPY) check_ireq && nostrict "line $line: $cmd is deprecated, use ${cmd/COPY/WRITE} instead" && ireq "VR_$p1=\"\${$CONST$p1}\"";;
+		CONST_WRITE|CONSTWRITE) ireq "VR_$p2=\"\${$CONST$p1}\"";;
 
 		# Compiler directives
 		_MSG) [ -n "$p2" ] && p2=" $p2"; echom "_MSG: '$p1$p2'";;
 		_WARN) [ -n "$p2" ] && p2=" $p2"; warn "_MSG: '$p1$p2'";;
 		_ERR) [ -n "$p2" ] && p2=" $p2"; error "_ERR: '$p1$p2'";;
 		_OPT) BASHGENN="${BASHGENN/\[$p1=*\]/""}" && BASHGENN="$BASHGENN[$p1=$p2]";;
+
+		# Comments
+		-*) ;;
 
 		# Error: invalid command
 		_*) error "$cmd: invalid compiler directive";;
