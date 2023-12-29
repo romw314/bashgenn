@@ -1,3 +1,25 @@
+# BASHGENN IS DEPRECATED: [RBGN](https://github.com/romw314/rust-bashgenn) IS A MODERN ALTERNATIVE TO BASHGENN. IF YOU STILL NEED TO USE BASHGENN, WRITE YOUR SCRIPTS WITHOUT ANY BASHGENN-SPECIFIC COMMANDS!
+
+RBGN is a new, cross-platform and modern Bashgenn interpreter written in Rust. RBGN is currently in development and if you need Bashgenn-specific features, use Bashgenn. **YOU SHOULD NOT USE BASHGENN IF RBGN CAN RUN YOUR SCRIPT PROPERLY.**
+
+Using RBGN is very simple. First of all, you need to [install Rust](https://rustup.rs). Then, you need to install RBGN (if you are on Windows, run it with Powershell):
+
+```sh
+cargo install --git https://github.com/romw314/rust-bashgenn.git
+```
+
+When you have RBGN installed, you can run any script by running this command (replace `/path/to/your/script.bgn` with the actual path to the Bashgenn script you want to run):
+
+```sh
+rbgn -i /path/to/your/script.bgn
+```
+
+To get help about RBGN, run this command:
+
+```sh
+rbgn --help
+```
+
 # Bashgenn
 
 Bashgenn - the ***Bash*** script ***gen***erator for text ma***n***iputaion
@@ -48,7 +70,7 @@ bashgenn our_script.bgn
 ./bg-f
 ```
 
-Please note that Bashgenn always saves the output script to a file named `bg-f`. There's no option to change the output file.
+Please note that Bashgenn always saves the output script to a file named `bg-f`. There's no option to change the output file. It also can't compile the script to a binary, it compiles it only to Bash.
 
 We can also write the text three times:
 
