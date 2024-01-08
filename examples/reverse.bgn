@@ -1,0 +1,36 @@
+- Bashgenn text reverser example script
+- Compile with:
+-  bashgenn examples/reverse.bgn
+- Run with:
+-  ./bg-f
+- Example:
+-  << I like bashgenn
+-  >> nneghsab ekil I
+
+- Set constants
+CONST_SET input <<
+CONST_SET output >>
+CONST_SET any_char x
+
+- Enable IReq
+_OPT ireq true
+
+- Copy constants
+CONST_WRITE input input
+CONST_WRITE output output
+CONST_WRITE any_char forever
+
+- STRGET is a loop. In bashgenn, loops are ended with DONE.
+- The STRGET loop repeats the commands inside the loop while the string in the variable specified is not an empty string.
+- Our variable name is forever. This STRGET loop will repeat the commands forever.
+STRGET forever
+	NONL input
+	READ text
+	CONST_WRITE output result
+	STRGET text
+		STORELAST text first
+		STRCAT first result
+	DONE
+	ECHO result
+DONE
+

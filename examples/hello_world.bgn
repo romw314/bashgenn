@@ -1,0 +1,31 @@
+- Bashgenn text reverser example script
+- Compile with:
+-  bashgenn examples/hello_world.bgn
+- Run with:
+-  ./bg-f
+- Output:
+-  Hello, World!
+
+- In bashgenn lines starting with a dash (-) are comments
+- and are ignored with the compiler.
+
+- Set the hello constant to "Hello World!".
+CONST_SET hello Hello World!
+
+- CONST_WRITE (used below) is not a normal command, it is an IReq command,
+- we must enable IReq before using IReq commands.
+-
+- Commands starting with an underscore (_) are compiler directives.
+-
+- IReq can be enabled and disabled with this commands:
+-  _OPT ireq true
+-  _OPT ireq false
+_OPT ireq true
+
+- In bashgenn constant and variable are not the same,
+- we must copy the "Hello World!" text from the constant hello to the variable text with the CONST_WRITE command.
+CONST_WRITE hello text
+
+- The ECHO command is used to write text from a variable.
+- Our variable name is text.
+ECHO text
