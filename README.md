@@ -1,4 +1,4 @@
-# BASHGENN IS DEPRECATED: [RBGN](https://github.com/romw314/rust-bashgenn) IS A MODERN ALTERNATIVE TO BASHGENN. IF YOU STILL NEED TO USE BASHGENN, WRITE YOUR SCRIPTS WITHOUT ANY BASHGENN-SPECIFIC COMMANDS!
+# BASHGENN IS DEPRECATED: [RBGN](https://github.com/romw314/rust-bashgenn) IS A MODERN ALTERNATIVE TO BASHGENN. IF YOU STILL NEED TO USE BASHGENN, TRY TO WRITE SCRIPTS WITHOUT ANY BASHGENN-SPECIFIC COMMANDS!
 
 RBGN is a new, cross-platform and modern Bashgenn interpreter written in Rust. RBGN is currently in development and if you need Bashgenn-specific features, use Bashgenn. **YOU SHOULD NOT USE BASHGENN IF RBGN CAN RUN YOUR SCRIPT PROPERLY.**
 
