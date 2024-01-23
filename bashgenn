@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env -S bash
 
 color_term=false
 case "$TERM" in
