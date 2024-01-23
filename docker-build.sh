@@ -110,16 +110,19 @@ for variant in debian alpine; do
 			.
 
 		images+=("$imgname:$tagname")
+
+		case "$variant" in
+			debian) docker_tag "$imgname:$latestver-${variantver[debian]}" "$imgname:$latestver";;
+			alpine) docker_tag "$imgname:$latestver-${variantver[alpine]}" "$imgname:$latestver-alpine";;
+		esac
 	done
 done
 
 # Debian
-docker_tag "$imgname:$latestver-${variantver[debian]}" "$imgname:$latestver"
 docker_tag "$imgname:$latestver" "$imgname:latest"
 
 # Alpine Linux
 docker_tag "$imgname:$latestver-${variantver[alpine]}" "$imgname:${variantver[alpine]}"
-docker_tag "$imgname:$latestver-${variantver[alpine]}" "$imgname:$latestver-alpine"
 docker_tag "$imgname:${variantver[alpine]}" "$imgname:alpine"
 
 if [ "$push" = "true" ]; then
@@ -127,3 +130,6 @@ if [ "$push" = "true" ]; then
 		do_cmd "Pushing $img to Docker Hub..." docker push "$img"
 	done
 fi
+
+do_cmd "Resetting git changes..." git reset --hard
+do_cmd "Checking out master..." git checkout master
