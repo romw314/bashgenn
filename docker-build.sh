@@ -92,6 +92,7 @@ declare -a images
 
 for variant in debian alpine; do
 	for version in $(git tag --list | grep -E 'v[0-9]+'); do
+		do_cmd "Resetting git changes..." git reset --hard
 		do_cmd "Checking out $version..." git checkout "$version"
 		do_cmd "Adding master's Dockerfile..." git checkout master Dockerfile docker-build.sh
 
