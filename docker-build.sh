@@ -2,6 +2,11 @@
 
 set -eu
 
+if [ -n "$(git status --porcelain=v1)" ]; then
+	echo "Please commit or stash changes first!"
+	exit 2
+fi
+
 do_cmd() {
 	if [ ! "$dryrun" = "true" ]; then
 		echo "$1"
