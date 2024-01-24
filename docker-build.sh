@@ -93,7 +93,8 @@ declare -a images
 # Keep the same script when doing git checkout
 if [ -z "${_BASHGENN_DOCKER_BUILD:-}" ]; then
 	tempscript="$(mktemp)"
-	cat "$0" > "$tempscript"
+	cp -vf "$0" "$tempscript"
+	chmod +x "$tempscript"
 	_BASHGENN_DOCKER_BUILD=1 "$tempscript" "$@"
 fi
 
