@@ -28,7 +28,7 @@ docker_tag() {
 }
 
 rm_old() {
-	docker image ls "$imgname" --format '{{.Tag}}' | awk -v repo="$imgname" '{print repo":"$0}' | xargs -n20 docker rmi
+	docker image ls "$imgname" --format '{{.Tag}}' | awk -v repo="$imgname" '{print repo":"$0}' | xargs -n20 -r -P5 docker rmi
 }
 
 [ -n "${DEBUG:-}" ] && set -x
