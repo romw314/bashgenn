@@ -90,6 +90,13 @@ readonly latestver="v$(git tag --list | grep -E 'v[0-9]+' | cut -dv -f2 | sort -
 
 declare -a images
 
+# Keep the same script when doing git checkout
+if [ -z "${_BASHGENN_DOCKER_BUILD:-}" ]; then
+	tempscript="$(mktemp)"
+	cat "$0" > "$tempscript"
+	_BASHGENN_DOCKER_BUILD=1 "$tempscript" "$@"
+fi
+
 for variant in debian alpine; do
 	for version in $(git tag --list | grep -E 'v[0-9]+'); do
 		do_cmd "Resetting git changes..." git reset --hard
@@ -112,8 +119,8 @@ for variant in debian alpine; do
 		images+=("$imgname:$tagname")
 
 		case "$variant" in
-			debian) docker_tag "$imgname:$latestver-${variantver[debian]}" "$imgname:$latestver";;
-			alpine) docker_tag "$imgname:$latestver-${variantver[alpine]}" "$imgname:$latestver-alpine";;
+			debian) docker_tag "$imgname:$tagname" "$imgname:$version";;
+			alpine) docker_tag "$imgname:$tagname" "$imgname:$version-alpine";;
 		esac
 	done
 done
