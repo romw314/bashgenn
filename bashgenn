@@ -1,5 +1,19 @@
 #!/usr/bin/env -S bash
 
+#### CONFIG VALUES
+readonly version="7" author="romw314"
+####
+
+set -e
+
+if [ -z "$__BASHGENN" ]; then
+	export __BASHGENN=1
+	echo "BashGENN v$version by $author"
+	echo
+	echo "[sqen] -1"
+	echo
+fi
+
 color_term=false
 case "$TERM" in
 	*-256color|xterm-color)
@@ -7,16 +21,13 @@ case "$TERM" in
 esac
 
 _tc() { "$color_term"; }
-echom() { _tc && echo -ne "\x1B[0;36mmessage:\x1B[0m " || echo -n "message: "; echo "$@"; }
-warn() { _tc && echo -ne "\x1B[0;33mwarning:\x1B[0m " || echo -n "warning: "; echo "$@"; }
-error() { _tc && echo -ne "\x1B[0;31merror:\x1B[0m " || echo -n "error: "; echo "$@"; exit; }
+echom() { _tc && echo >&2 -ne "\x1B[0;36mmessage:\x1B[0m " || echo -n "message: "; echo "$@"; }
+warn()  { _tc && echo >&2 -ne "\x1B[0;33mwarning:\x1B[0m " || echo -n "warning: "; echo "$@"; }
+error() { _tc && echo >&2 -ne "\x1B[0;31merror:\x1B[0m "   || echo -n "error: ";   echo "$@"; exit; }
 
 if [ -t 0 -o $# -gt 0 ]; then
-	sleep 0.01
 	stdm=`cat "$@"`
-	sleep 0.7
 	echo "$stdm" | "$0"
-	sleep 1
 	exit
 fi
 
@@ -24,15 +35,17 @@ CONST="dd6bashgennCONST_STORECONST_IN_BASHGENN_TO_ebf00ddf_933f_464f_a18f_f08c81
 
 echo "Initializing bg-f..."
 true >bg-f
-ebgf() { echo "$@" >>"bg-f"; }
-check_ireq() { [[ "$BASHGENN" == *"[ireq=true]"* ]] || error "line $line: IReq is not enabled"; }
+ebgf() { echo -n "$@" >>"bg-f"; }
+ebgfnl() { echo "$@" >>"bg-f"; }
+check_ireq() { [[ "$BASHGENN" == *"[ireq=true]"* ]] || nostrict "line $line: IReq is not enabled"; }
 ireq() { check_ireq && ebgf "$@"; }
+if_ireq() { [[ "$BASHGENN" == *"[ireq=true]"* ]] && ebgf "$@"; }
 vars() {
-	FIRST="echo \"\${VR_$p1:0:1}\" && VR_$p1=\"\${VR_$p1:1}\""
-	LAST="echo \"\${VR_$p1:\$((\${#VR_$p1}-1)):1}\" && VR_$p1=\"\${VR_$p1:0:\$((\${#VR_$p1}-1))}\""
-	CHINC="awk \"BEGIN{printf(\\\"%c\\\",\$(printf %d \"'\${VR_$p1}\")+1)}\""
+	FIRST="echo \"\${VR_$p1:0:1}\" && VR_$p1=\"\${VR_$p1:1}\";"
+	LAST="echo \"\${VR_$p1:\$((\${#VR_$p1}-1)):1}\" && VR_$p1=\"\${VR_$p1:0:\$((\${#VR_$p1}-1))}\";"
+	CHINC="awk \"BEGIN{printf(\\\"%c\\\",\$(printf %d \"'\${VR_$p1}\")+1)}\";"
 	CHDEC="${CHINC/+1/-1}"
-	STRRANGE="while test \$(printf %d \"'\${VR_$p1}\") -gt \$(printf %d \"'\${VR_$p2}\"); do"
+	STRRANGE="while [ \$(printf %d \"'\${VR_$p1}\") -gt \$(printf %d \"'\${VR_$p2}\") ];do "
 }
 
 nostrict() {
@@ -78,18 +91,27 @@ else
 	configurate default
 fi
 
-[ -n "$BDEBUG$DEBUG" ] && printf "[ DEBUG ] Config: \n%s" "$BASHGENN"
+if [ -n "$BDEBUG$DEBUG" ]; then
+	printf "[ DEBUG ] Config: \n%s" "$BASHGENN"
+fi
 
 # Shebang
-ebgf "#!$(which env) -S bash"
+ebgfnl "#!$(which env) -S bash"
+ebgf "set -eu;"
+
+readonly ireq_id_rreptget="_bgn$RANDOM" ireq_id_rreptset="_bgn$RANDOM" ireq_id_rreptinc="_bgn$RANDOM" ireq_var_rrept="_bgn$RANDOM" ireq_var_constcopy="_bgn$CONST$RANDOM"
 
 line=0
 while read cmd p1 p2; do
-	let line++
-	[ -z "$cmd$p1$p2" ] && continue
-	[ "${cmd:0:1}" = "_" -o "${cmd:0:1}" = "-" ] || echo "Processing $cmd at line $line..."
+	let line++ ||:
+	if [ -z "$cmd$p1$p2" ]; then
+		continue
+	fi
+	if ! [ "${cmd:0:1}" = "_" -o "${cmd:0:1}" = "-" ]; then
+		echo "Processing $cmd at line $line..."
+	fi
 	case "$cmd" in
-		CONST_SET|CONSTSET|-*) ;;
+		CONST_SET|CONSTSET|-*) :;;
 		*)
 			if test -n "$(echo "$cmd $p1 $p2" | tr -d ' a-zA-Z0-9_-')"; then
 				nostrict "line $line: command contains invalid characters"
@@ -97,17 +119,18 @@ while read cmd p1 p2; do
 	esac
 	vars
 	case "$cmd" in
+		PROG_INIT) if_ireq "$ireq_id_rreptget(){echo \"\$$ireq_var_rrept\";}$ireq_id_rreptset(){$ireq_var_rrept=\"\$1\"}$ireq_id_rreptinc(){let $ireq_var_rrept++}declare $ireq_var_rrept;";;
 		# Runtime commands
-		READ) ebgf "read VR_$p1";;
-		STDIN) ebgf "while read VR_$p1;do";;
-		STRGET) ebgf "while test -n \"\${VR_$p1}\";do";;
-		ECHO) ebgf "echo \"\${VR_$p1}\"";;
-		NONL) ebgf "echo -n \"\${VR_$p1}\"";;
-		COPY) ebgf "VR_$p1=\"\${VR_$p2}\"";;
-		STOP) ebgf "exit $p1";;
-		KILL) ebgf "kill \$\$";;
-		DONE) ebgf "done";;
-		REPEAT) ebgf "for To$(date +%N) in \$(seq 1 1 $p1);do";;
+		READ) ebgf "read VR_$p1;";;
+		STDIN) ebgf "while read VR_$p1;do ";;
+		STRGET) ebgf "while test -n \"\${VR_$p1}\";do ";;
+		ECHO) ebgf "echo \"\${VR_$p1}\";";;
+		NONL) ebgf "echo -n \"\${VR_$p1}\";";;
+		COPY) ebgf "VR_$p1=\"\${VR_$p2}\";";;
+		STOP) ebgf "exit $p1;";;
+		KILL) ebgf "kill -9 \$\$;";;
+		DONE) ebgf "done;";;
+		REPEAT) ebgf "for To$(date +%N) in \$(seq 1 1 $p1);do ";;
 		FIRST) ebgf "$FIRST";;
 		LAST) ebgf "$LAST";;
 		STOREFIRST) ebgf "${FIRST/"echo "/"VR_$p2="}";;
@@ -118,20 +141,21 @@ while read cmd p1 p2; do
 		STORECHDEC) ebgf "VR_$p2=\"\$($CHDEC)\"";;
 		STRRANGE) ebgf "$STRRANGE";;
 		STRRANGELESS) ebgf "${STRRANGE/-gt/-lt}";;
-		STRCAT) ebgf "VR_$p2=\"\${VR_$p2}\${VR_$p1}\"";;
-		FIND) ebgf "Rto=\"\${VR_$p1#*\"\${VR_$p2}\"}\"&&echo \$((\${#VR_$p1}-\${#Rto}-\${#VR_$p2}))";;
-		CONST_SET|CONSTSET) ebgf "${CONST}$p1='$p2'";;
-		CONST_SCAN|CONSTSCAN) ebgf "tempc_$p1=\"\${${CONST}$p1}\"&&while test \${#tempc_$p1} -gt 0;do VR_$p2=\"\${tempc_$p1:\$((\${#tempc_$p1}-1)):1}\" && tempc_$p1=\"\${tempc_$p1:0:\$((\${#tempc_$p1}-1))}\"";;
+		STRCAT) ebgf "VR_$p2=\"\${VR_$p2}\${VR_$p1}\";";;
+		FIND) ebgf "Rto=\"\${VR_$p1#*\"\${VR_$p2}\"}\"&&echo \$((\${#VR_$p1}-\${#Rto}-\${#VR_$p2}));";;
+		CONST_SET|CONSTSET) ebgf "${ireq_var_constcopy}$p1='$p2';";;
+		CONST_SCAN|CONSTSCAN) ebgf "tempc_$p1=\"\${${ireq_var_constcopy}$p1}\"&&while test \${#tempc_$p1} -gt 0;do VR_$p2=\"\${tempc_$p1:\$((\${#tempc_$p1}-1)):1}\" && tempc_$p1=\"\${tempc_$p1:0:\$((\${#tempc_$p1}-1))}\";";;
 
 		# IReq runtime commands
-		RREPT) ireq "for To$(date +%N) in \$(seq 1 1 \${VR_$p1});do";;
-		CONST_COPY|CONSTCOPY) check_ireq && nostrict "line $line: $cmd is deprecated, use ${cmd/COPY/WRITE} instead" && ireq "VR_$p1=\"\${$CONST$p1}\"";;
-		CONST_WRITE|CONSTWRITE) ireq "VR_$p2=\"\${$CONST$p1}\"";;
+		RREPT) nostrict "line $line: $cmd is deprecated, use IREPT instead" && ireq "for To$(date +%N) in \$(seq 1 1 \${VR_$p1});do ";;
+		IREPT) ireq "$ireq_id_rreptset 0;while [ \"\$($ireq_id_rreptget)\" -lt \"\${VR_$p1}\";do ";;
+		CONST_COPY|CONSTCOPY) check_ireq && nostrict "line $line: $cmd is deprecated, use ${cmd/COPY/WRITE} instead" && ireq "VR_$p1=\"\${$ireq_var_constcopy$p1}\";";;
+		CONST_WRITE|CONSTWRITE) ireq "VR_$p2=\"\${$ireq_var_constcopy$p1}\";";;
 
 		# Compiler directives
-		_MSG) [ -n "$p2" ] && p2=" $p2"; echom "_MSG: '$p1$p2'";;
-		_WARN) [ -n "$p2" ] && p2=" $p2"; warn "_MSG: '$p1$p2'";;
-		_ERR) [ -n "$p2" ] && p2=" $p2"; error "_ERR: '$p1$p2'";;
+		_MSG)  [ -n "$p2" ] && p2=" $p2"; echom "_MSG: '$p1$p2'";;
+		_WARN) [ -n "$p2" ] && p2=" $p2"; warn "_WARN: '$p1$p2'";;
+		_ERR)  [ -n "$p2" ] && p2=" $p2"; error "_ERR: '$p1$p2'";;
 		_OPT) BASHGENN="${BASHGENN/\[$p1=*\]/""}" && BASHGENN="$BASHGENN[$p1=$p2]";;
 
 		# Comments
@@ -141,9 +165,7 @@ while read cmd p1 p2; do
 		_*) error "$cmd: invalid compiler directive";;
 		*) error "$cmd: invalid command";;
 	esac
-	sleep 0.05
 done
 
-sleep 0.5
 echo "Making bg-f executable..."
 chmod a+x bg-f
