@@ -125,6 +125,7 @@ while read cmd p1 p2; do
 	case "$cmd" in
 		PROG_INIT) if_ireq "$ireq_id_rreptget(){echo \"\$$ireq_var_rrept\";}$ireq_id_rreptset(){$ireq_var_rrept=\"\$1\"}$ireq_id_rreptinc(){let $ireq_var_rrept++}declare $ireq_var_rrept;";;
 		# Runtime commands
+		DECLARE) ebgf "declare VR_$p1;";;
 		READ) ebgf "read VR_$p1;";;
 		STDIN) ebgf "while read VR_$p1;do ";;
 		STRGET) ebgf "while test -n \"\${VR_$p1}\";do ";;
