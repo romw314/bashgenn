@@ -39,7 +39,11 @@ ebgf() { echo -n "$@" >>"bg-f"; }
 ebgfnl() { echo "$@" >>"bg-f"; }
 check_ireq() { [[ "$BASHGENN" == *"[ireq=true]"* ]] || nostrict "line $line: IReq is not enabled"; }
 ireq() { check_ireq && ebgf "$@"; }
-if_ireq() { [[ "$BASHGENN" == *"[ireq=true]"* ]] && ebgf "$@"; }
+if_ireq() {
+	if [[ "$BASHGENN" == *"[ireq=true]"* ]]; then
+		ebgf "$@"
+	fi
+}
 vars() {
 	FIRST="echo \"\${VR_$p1:0:1}\" && VR_$p1=\"\${VR_$p1:1}\";"
 	LAST="echo \"\${VR_$p1:\$((\${#VR_$p1}-1)):1}\" && VR_$p1=\"\${VR_$p1:0:\$((\${#VR_$p1}-1))}\";"
