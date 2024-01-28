@@ -1,7 +1,7 @@
 #!/usr/bin/env -S bash
 
 #### CONFIG VALUES
-readonly version="7" author="romw314"
+readonly version="7" author="romw314" issues="https://bit.ly/bgn-bugs"
 ####
 
 set -e
@@ -14,6 +14,8 @@ if [ -z "$__BASHGENN" ]; then
 	echo
 fi
 
+readonly newline=$'\n' esc=$'\x1B'
+
 color_term=false
 case "$TERM" in
 	*-256color|xterm-color)
@@ -21,9 +23,9 @@ case "$TERM" in
 esac
 
 _tc() { "$color_term"; }
-echom() { _tc && echo >&2 -ne "\x1B[0;36mmessage:\x1B[0m " || echo -n "message: "; echo "$@"; }
-warn()  { _tc && echo >&2 -ne "\x1B[0;33mwarning:\x1B[0m " || echo -n "warning: "; echo "$@"; }
-error() { _tc && echo >&2 -ne "\x1B[0;31merror:\x1B[0m "   || echo -n "error: ";   echo "$@"; exit; }
+echom() { _tc && echo >&2 -n "$esc[0;36mmessage:$esc[0m " || echo -n "message: "; echo "$@"; }
+warn()  { _tc && echo >&2 -n "$esc[0;33mwarning:$esc[0m " || echo -n "warning: "; echo "$@"; }
+error() { _tc && echo >&2 -n "$esc[0;31merror:$esc[0m "   || echo -n "error: ";   echo "$@"; exit; }
 
 if [ -t 0 -o $# -gt 0 ]; then
 	stdm=`cat "$@"`
@@ -52,10 +54,51 @@ vars() {
 	STRRANGE="while [ \$(printf %d \"'\${VR_$p1}\") -gt \$(printf %d \"'\${VR_$p2}\") ];do "
 }
 
+findmod() {
+	mod="$(find -L . $(echo "${BASHGENN_MOD_PATH:-$default_mod_path}" | tr : ' ') -name "$1.bgmod")"
+	if [ -z "$mod" ]; then
+		error "Couldn't find module \`$1'"
+	fi
+	echo "$mod"
+}
+addmod() {
+	mv bg-f bg-f.mod."$module"
+	"$0" &>/dev/null < "$1"
+	cat bg-f
+	rm bg-f
+	mv bg-f.mod."$module" bg-f
+}
+if_mod() {
+	[ "$modules_enabled" = true ] || error "Modules must be enabled"
+}
+no_mod() {
+	[ ! "$modules_enabled" = true ] || error "Modules cannot be enabled"
+}
+mod_check() {
+	if test -n "$(echo "$1" | tr -d "$([ "$2" = "name" ] && echo 'a-z_' || echo 'a-zA-Z0-9._')")"; then
+		[ "$2" = "name" ] && \
+			error "line $line: module name contains invalid characters, can contain only small alphabet characters and underscore (_)" || \
+			error "line $line: function name contains invalid characters, can contain only alphanumeric characters, dot (.) and underscore (_)"
+	fi
+}
+
 nostrict() {
 	if  [[ "$BASHGENN" != *"[strict=none]"* ]]; then
 		[[ "$BASHGENN" == *"[strict=warn]"* ]] && local type=warn || local type=error
 		"$type" "$@"
+	fi
+}
+
+depr() {
+	if [[ "$BASHGENN" != *"[depr=none]" ]]; then
+		[[ "$BASHGENN" == *"[depr=err]"* ]] && local type=error || local type=warn
+		case "$#" in
+			1) "$type" "$@";;
+			2) "$type" "line $1: $2 is deprecated";;
+			3) "$type" "line $1: $2 is deprecated, use $3 instead";;
+			4) "$type" "line $1: $2 is deprecated, use $3 instead. Learn more: $4";;
+			*) error "Bashgenn internal error, please report it on GitHub and include this content in the issue description:$newline$esc[0;33m> BASHGENN \`E_INVALID_DEPR\`:${newline}> The \`depr\` function has called with \`$#\` arguments, but it accepts only \`1\` to \`4\` arguments.$esc[0m"
+		esac
 	fi
 }
 
@@ -83,8 +126,9 @@ configurate() {
 	echo " OK"
 }
 readonly config_default="\
-[strict=warn]
+[strict=err]
 [ireq=false]
+[depr=warn]
 "
 if [ -n "$BASHGENN_CONFIG" ] || \
 	config_find "./.bgconf" || \
@@ -103,7 +147,8 @@ fi
 ebgfnl "#!$(which env) -S bash"
 ebgf "set -eu;"
 
-readonly ireq_id_rreptget="_bgn$RANDOM" ireq_id_rreptset="_bgn$RANDOM" ireq_id_rreptinc="_bgn$RANDOM" ireq_var_rrept="_bgn$RANDOM" ireq_var_constcopy="_bgn$CONST$RANDOM"
+readonly ireq_id_rreptget="_bgn$RANDOM" ireq_id_rreptset="_bgn$RANDOM" ireq_id_rreptinc="_bgn$RANDOM" ireq_var_rrept="_bgn$RANDOM" ireq_var_constcopy="_bgn$CONST$RANDOM" func_id="real_$RANDOM" bgmod="bgmod."
+declare modules_enabled="false" module=""
 
 line=0
 while read cmd p1 p2; do
@@ -112,10 +157,10 @@ while read cmd p1 p2; do
 		continue
 	fi
 	if ! [ "${cmd:0:1}" = "_" -o "${cmd:0:1}" = "-" ]; then
-		echo "Processing $cmd at line $line..."
+		echo "Processing $esc[36m$cmd$esc[0m at line $line..."
 	fi
 	case "$cmd" in
-		CONST_SET|CONSTSET|-*) :;;
+		CONST_SET|CONSTSET|USE|-*) :;;
 		*)
 			if test -n "$(echo "$cmd $p1 $p2" | tr -d ' a-zA-Z0-9_-')"; then
 				nostrict "line $line: command contains invalid characters"
@@ -123,8 +168,9 @@ while read cmd p1 p2; do
 	esac
 	vars
 	case "$cmd" in
-		PROG_INIT) if_ireq "$ireq_id_rreptget(){echo \"\$$ireq_var_rrept\";}$ireq_id_rreptset(){$ireq_var_rrept=\"\$1\"}$ireq_id_rreptinc(){let $ireq_var_rrept++}declare $ireq_var_rrept;";;
+		PROG_INIT) if_ireq "$newline$ireq_id_rreptget(){echo \"\$$ireq_var_rrept\";}$newline$ireq_id_rreptset(){$ireq_var_rrept=\"\$1\"}$newline$ireq_id_rreptinc(){let $ireq_var_rrept++}${newline}declare $ireq_var_rrept;";;
 		# Runtime commands
+		ALLOW_UNDEF) ebgf "set +u";;
 		DECLARE) ebgf "declare VR_$p1;";;
 		READ) ebgf "read VR_$p1;";;
 		STDIN) ebgf "while read VR_$p1;do ";;
@@ -151,11 +197,22 @@ while read cmd p1 p2; do
 		CONST_SET|CONSTSET) ebgf "${ireq_var_constcopy}$p1='$p2';";;
 		CONST_SCAN|CONSTSCAN) ebgf "tempc_$p1=\"\${${ireq_var_constcopy}$p1}\"&&while test \${#tempc_$p1} -gt 0;do VR_$p2=\"\${tempc_$p1:\$((\${#tempc_$p1}-1)):1}\" && tempc_$p1=\"\${tempc_$p1:0:\$((\${#tempc_$p1}-1))}\";";;
 
+		# Functions
+		FUNC) no_mod && depr "$line" "$cmd" "Bashgenn modules (EXPORT)" && ebgf "$newline$func_id$p1() {";;
+		CALL) no_mod && depr "$line" "$cmd" "Bashgenn modules (USE)" && ebgf "$func_id$p1;";;
+		ENDFUNC) ebgfnl "}";;
+
 		# IReq runtime commands
-		RREPT) nostrict "line $line: $cmd is deprecated, use IREPT instead" && ireq "for To$(date +%N) in \$(seq 1 1 \${VR_$p1});do ";;
+		RREPT) depr "$line" "$cmd" "IREPT" && ireq "for To$(date +%N) in \$(seq 1 1 \${VR_$p1});do ";;
 		IREPT) ireq "$ireq_id_rreptset 0;while [ \"\$($ireq_id_rreptget)\" -lt \"\${VR_$p1}\";do ";;
-		CONST_COPY|CONSTCOPY) check_ireq && nostrict "line $line: $cmd is deprecated, use ${cmd/COPY/WRITE} instead" && ireq "VR_$p1=\"\${$ireq_var_constcopy$p1}\";";;
+		CONST_COPY|CONSTCOPY) check_ireq && depr "$line" "$cmd" "${cmd/COPY/WRITE}" && ireq "VR_$p1=\"\${$ireq_var_constcopy$p1}\";";;
 		CONST_WRITE|CONSTWRITE) ireq "VR_$p2=\"\${$ireq_var_constcopy$p1}\";";;
+
+		# Modules
+		MODULE) no_mod && modules_enabled="true" && mod_check "$p1" "name" && module="$p1";;
+		IMPORT) if_mod && echo "Compiling $esc[36m$p1$esc[0m..." && ebgf "$(addmod "$(findmod "$p1")")";;
+		EXPORT) if_mod && mod_check "$p1" && ebgf "$newline$bgmod$module.$p1() {";;
+		USE) if_mod && mod_check "$p1" && ebgf "$bgmod$p1;";;
 
 		# Compiler directives
 		_MSG)  [ -n "$p2" ] && p2=" $p2"; echom "_MSG: '$p1$p2'";;
