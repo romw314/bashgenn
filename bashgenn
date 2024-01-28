@@ -14,7 +14,7 @@ if [ -z "$__BASHGENN" ]; then
 	echo
 fi
 
-readonly newline=$'\n' esc=$'\x1B'
+readonly newline=$'\n' esc=$'\x1B' default_mod_path="/usr/share/bashgenn/modules:$HOME/.local/share/bashgenn/modules"
 
 color_term=false
 case "$TERM" in
@@ -55,7 +55,7 @@ vars() {
 }
 
 findmod() {
-	mod="$(find -L . $(echo "${BASHGENN_MOD_PATH:-$default_mod_path}" | tr : ' ') -name "$1.bgmod")"
+	mod="$(find -L . $(echo "${BASHGENN_MOD_PATH:-$default_mod_path}" | tr : ' ') -name "$1.bgmod" || :)"
 	if [ -z "$mod" ]; then
 		error "Couldn't find module \`$1'"
 	fi
