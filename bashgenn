@@ -186,10 +186,10 @@ while read cmd p1 p2; do
 		LAST) ebgf "$LAST";;
 		STOREFIRST) ebgf "${FIRST/"echo "/"VR_$p2="}";;
 		STORELAST) ebgf "${LAST/"echo "/"VR_$p2="}";;
-		CHINC) ebgf "$CHINC";;
-		CHDEC) ebgf "$CHDEC";;
-		STORECHINC) ebgf "VR_$p2=\"\$($CHINC)\"";;
-		STORECHDEC) ebgf "VR_$p2=\"\$($CHDEC)\"";;
+		CHINC) ebgf "$CHINC;";;
+		CHDEC) ebgf "$CHDEC;";;
+		STORECHINC) ebgf "VR_$p2=\"\$($CHINC)\";";;
+		STORECHDEC) ebgf "VR_$p2=\"\$($CHDEC)\";";;
 		STRRANGE) ebgf "$STRRANGE";;
 		STRRANGELESS) ebgf "${STRRANGE/-gt/-lt}";;
 		STRCAT) ebgf "VR_$p2=\"\${VR_$p2}\${VR_$p1}\";";;
