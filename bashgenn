@@ -209,7 +209,7 @@ while read cmd p1 p2; do
 
 		# IReq runtime commands
 		RREPT) depr "$line" "$cmd" "IREPT" && ireq "for To$(date +%N) in \$(seq 1 1 \${VR_$p1});do ";;
-		IREPT) ireq "$ireq_id_rreptset 0;while [ \"\$($ireq_id_rreptget)\" -lt \"\${VR_$p1}\";do ";;
+		IREPT) ireq "$ireq_id_rreptset 0;while [ \"\$($ireq_id_rreptget)\" -lt \"\${VR_$p1}\" ];do $ireq_rreptinc;";;
 		CONST_COPY|CONSTCOPY) check_ireq && depr "$line" "$cmd" "${cmd/COPY/WRITE}" && ireq "VR_$p1=\"\${$ireq_var_constcopy$p1}\";";;
 		CONST_WRITE|CONSTWRITE) ireq "VR_$p2=\"\${$ireq_var_constcopy$p1}\";";;
 		CHORD) ireq "$ireq_id_ord \"\${VR_$p1}\";echo;";;
