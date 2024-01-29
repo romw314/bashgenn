@@ -147,7 +147,10 @@ fi
 ebgfnl "#!$(which env) -S bash"
 ebgf "set -eu;"
 
-readonly ireq_id_rreptget="_bgn$RANDOM" ireq_id_rreptset="_bgn$RANDOM" ireq_id_rreptinc="_bgn$RANDOM" ireq_var_rrept="_bgn$RANDOM" ireq_var_constcopy="_bgn$CONST$RANDOM" func_id="real_$RANDOM" bgmod="bgmod."
+readonly \
+	ireq_id_rreptget="_bgn$RANDOM" ireq_id_rreptset="_bgn$RANDOM" ireq_id_rreptinc="_bgn$RANDOM" ireq_var_rrept="_bgn$RANDOM" \
+	ireq_var_constcopy="_bgn$CONST$RANDOM" func_id="real_$RANDOM" bgmod="bgmod." \
+	ireq_id_ord="_bgn$RANDOM" ireq_id_chr="_bgn$RANDOM"
 declare modules_enabled="false" module=""
 
 line=0
@@ -168,7 +171,7 @@ while read cmd p1 p2; do
 	esac
 	vars
 	case "$cmd" in
-		PROG_INIT) if_ireq "$newline$ireq_id_rreptget(){ echo \"\$$ireq_var_rrept\";}$newline$ireq_id_rreptset(){ $ireq_var_rrept=\"\$1\";}$newline$ireq_id_rreptinc(){ let $ireq_var_rrept++;}${newline}declare $ireq_var_rrept;";;
+		PROG_INIT) if_ireq "$newline$ireq_id_rreptget(){ echo \"\$$ireq_var_rrept\";}$newline$ireq_id_rreptset(){ $ireq_var_rrept=\"\$1\";}$newline$ireq_id_rreptinc(){ let $ireq_var_rrept++;}${newline}declare $ireq_var_rrept;$newline$ireq_id_chr(){ printf \\\\\$(printf '%03o' \$1);}$newline$ireq_id_ord(){ printf '%d' \"'\$1\";}$newline";;
 		# Runtime commands
 		ALLOW_UNDEF) ebgf "set +u;";;
 		DECLARE) ebgf "declare VR_$p1;";;
@@ -207,6 +210,10 @@ while read cmd p1 p2; do
 		IREPT) ireq "$ireq_id_rreptset 0;while [ \"\$($ireq_id_rreptget)\" -lt \"\${VR_$p1}\";do ";;
 		CONST_COPY|CONSTCOPY) check_ireq && depr "$line" "$cmd" "${cmd/COPY/WRITE}" && ireq "VR_$p1=\"\${$ireq_var_constcopy$p1}\";";;
 		CONST_WRITE|CONSTWRITE) ireq "VR_$p2=\"\${$ireq_var_constcopy$p1}\";";;
+		CHORD) ireq "$ireq_id_ord \"\${VR_$p1}\";echo;";;
+		CHCHR) ireq "$ireq_id_chr \"\${VR_$p1}\";echo;";;
+		STORECHORD) ireq "VR_$p2=\"\$($ireq_id_ord \"\${VR_$p1}\")\";";;
+		STORECHCHR) ireq "VR_$p2=\"\$($ireq_id_chr \"\${VR_$p1}\")\";";;
 
 		# Modules
 		MODULE) no_mod && modules_enabled="true" && mod_check "$p1" "name" && module="$p1";;
