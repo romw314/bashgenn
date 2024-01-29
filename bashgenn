@@ -97,7 +97,7 @@ depr() {
 			2) "$type" "line $1: $2 is deprecated";;
 			3) "$type" "line $1: $2 is deprecated, use $3 instead";;
 			4) "$type" "line $1: $2 is deprecated, use $3 instead. Learn more: $4";;
-			*) error "Bashgenn internal error, please report it on GitHub and include this content in the issue description:$newline$esc[0;33m> BASHGENN \`E_INVALID_DEPR\`:${newline}> The \`depr\` function has called with \`$#\` arguments, but it accepts only \`1\` to \`4\` arguments.$esc[0m"
+			*) error "Bashgenn internal error, please report it on GitHub ($issues) and include this content in the issue description:$newline$esc[0;33m> BASHGENN \`E_INVALID_DEPR\`:${newline}> The \`depr\` function has called with \`$#\` arguments, but it accepts only \`1\` to \`4\` arguments.$esc[0m"
 		esac
 	fi
 }
