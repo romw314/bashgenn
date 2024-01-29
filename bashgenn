@@ -14,7 +14,7 @@ if [ -z "$__BASHGENN" ]; then
 	echo
 fi
 
-readonly newline=$'\n' esc=$'\x1B' default_mod_path="/usr/share/bashgenn/modules:$HOME/.local/share/bashgenn/modules"
+readonly newline=$'\n' esc=$'\x1B' default_mod_path="$HOME/.local/share/bashgenn/modules:/usr/local/share/bashgenn/modules:/usr/share/bashgenn/modules"
 
 color_term=false
 case "$TERM" in
