@@ -1,7 +1,7 @@
 #!/usr/bin/env -S bash
 
 #### CONFIG VALUES
-readonly version="8" author="romw314" issues="https://bit.ly/bgn-bugs"
+readonly version="9" author="romw314" issues="https://bit.ly/bgn-bugs"
 ####
 
 set -e
