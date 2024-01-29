@@ -210,7 +210,7 @@ while read cmd p1 p2; do
 
 		# Modules
 		MODULE) no_mod && modules_enabled="true" && mod_check "$p1" "name" && module="$p1";;
-		IMPORT) if_mod && echo "Compiling $esc[36m$p1$esc[0m..." && ebgf "$(addmod "$(findmod "$p1")")";;
+		IMPORT) if_mod && echo "Compiling $esc[36m$p1$esc[0m..." && ebgf " $(addmod "$(findmod "$p1")")";;
 		EXPORT) if_mod && mod_check "$p1" && ebgf "$newline$bgmod$module.$p1() {";;
 		USE) if_mod && mod_check "$p1" && ebgf "$bgmod$p1;";;
 
