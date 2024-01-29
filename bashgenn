@@ -160,7 +160,7 @@ while read cmd p1 p2; do
 		echo "Processing $esc[36m$cmd$esc[0m at line $line..."
 	fi
 	case "$cmd" in
-		CONST_SET|CONSTSET|USE|-*) :;;
+		CONST_SET|CONSTSET|USE|EXPORT|-*) :;;
 		*)
 			if test -n "$(echo "$cmd $p1 $p2" | tr -d ' a-zA-Z0-9_-')"; then
 				nostrict "line $line: command contains invalid characters"
