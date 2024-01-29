@@ -199,6 +199,8 @@ while read cmd p1 p2; do
 		FIND) ebgf "Rto=\"\${VR_$p1#*\"\${VR_$p2}\"}\"&&echo \$((\${#VR_$p1}-\${#Rto}-\${#VR_$p2}));";;
 		CONST_SET|CONSTSET) ebgf "${ireq_var_constcopy}$p1='$p2';";;
 		CONST_SCAN|CONSTSCAN) ebgf "tempc_$p1=\"\${${ireq_var_constcopy}$p1}\"&&while test \${#tempc_$p1} -gt 0;do VR_$p2=\"\${tempc_$p1:\$((\${#tempc_$p1}-1)):1}\" && tempc_$p1=\"\${tempc_$p1:0:\$((\${#tempc_$p1}-1))}\";";;
+		SAMENUMINC) ebgf "let VR_$p1++;";;
+		SAMENUMDEC) ebgf "let VR_$p1--;";;
 
 		# Functions
 		FUNC) no_mod && depr "$line" "$cmd" "Bashgenn modules (EXPORT)" && ebgf "$newline$func_id$p1() { ";;
