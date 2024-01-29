@@ -170,7 +170,7 @@ while read cmd p1 p2; do
 	case "$cmd" in
 		PROG_INIT) if_ireq "$newline$ireq_id_rreptget(){ echo \"\$$ireq_var_rrept\";}$newline$ireq_id_rreptset(){ $ireq_var_rrept=\"\$1\";}$newline$ireq_id_rreptinc(){ let $ireq_var_rrept++;}${newline}declare $ireq_var_rrept;";;
 		# Runtime commands
-		ALLOW_UNDEF) ebgf "set +u";;
+		ALLOW_UNDEF) ebgf "set +u;";;
 		DECLARE) ebgf "declare VR_$p1;";;
 		READ) ebgf "read VR_$p1;";;
 		STDIN) ebgf "while read VR_$p1;do ";;
