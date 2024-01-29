@@ -168,7 +168,7 @@ while read cmd p1 p2; do
 	esac
 	vars
 	case "$cmd" in
-		PROG_INIT) if_ireq "$newline$ireq_id_rreptget(){echo \"\$$ireq_var_rrept\";}$newline$ireq_id_rreptset(){$ireq_var_rrept=\"\$1\"}$newline$ireq_id_rreptinc(){let $ireq_var_rrept++}${newline}declare $ireq_var_rrept;";;
+		PROG_INIT) if_ireq "$newline$ireq_id_rreptget(){ echo \"\$$ireq_var_rrept\";}$newline$ireq_id_rreptset(){ $ireq_var_rrept=\"\$1\"}$newline$ireq_id_rreptinc(){ let $ireq_var_rrept++}${newline}declare $ireq_var_rrept;";;
 		# Runtime commands
 		ALLOW_UNDEF) ebgf "set +u";;
 		DECLARE) ebgf "declare VR_$p1;";;
@@ -198,7 +198,7 @@ while read cmd p1 p2; do
 		CONST_SCAN|CONSTSCAN) ebgf "tempc_$p1=\"\${${ireq_var_constcopy}$p1}\"&&while test \${#tempc_$p1} -gt 0;do VR_$p2=\"\${tempc_$p1:\$((\${#tempc_$p1}-1)):1}\" && tempc_$p1=\"\${tempc_$p1:0:\$((\${#tempc_$p1}-1))}\";";;
 
 		# Functions
-		FUNC) no_mod && depr "$line" "$cmd" "Bashgenn modules (EXPORT)" && ebgf "$newline$func_id$p1() {";;
+		FUNC) no_mod && depr "$line" "$cmd" "Bashgenn modules (EXPORT)" && ebgf "$newline$func_id$p1() { ";;
 		CALL) no_mod && depr "$line" "$cmd" "Bashgenn modules (USE)" && ebgf "$func_id$p1;";;
 		ENDFUNC) ebgfnl "}";;
 
@@ -211,7 +211,7 @@ while read cmd p1 p2; do
 		# Modules
 		MODULE) no_mod && modules_enabled="true" && mod_check "$p1" "name" && module="$p1";;
 		IMPORT) if_mod && echo "Compiling $esc[36m$p1$esc[0m..." && ebgfnl " $(addmod "$(findmod "$p1")")";;
-		EXPORT) if_mod && mod_check "$p1" && ebgf "$newline$bgmod$module.$p1() {";;
+		EXPORT) if_mod && mod_check "$p1" && ebgf "$newline$bgmod$module.$p1() { ";;
 		USE) if_mod && mod_check "$p1" && ebgf "$bgmod$p1;";;
 
 		# Compiler directives
