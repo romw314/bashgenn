@@ -1,7 +1,7 @@
 #!/usr/bin/env -S bash
 
 #### CONFIG VALUES
-readonly version="9" author="romw314" issues="https://bit.ly/bgn-bugs"
+readonly version="10" author="romw314" issues="https://bit.ly/bgn-bugs"
 ####
 
 set -e
@@ -177,7 +177,7 @@ while read cmd p1 p2; do
 		ALLOW_ERROR) ebgf "set +e;";;
 		DISALLOW_ERROR) ebgf "set -e;";;
 		DISALLOW_UNDEF) ebgf "set -u;";;
-		DECLARE) ebgf "declare VR_$p1;";;
+		DECLARE) ebgf "declare VR_$p1='';";;
 		READ) ebgf "read VR_$p1;";;
 		STDIN) ebgf "while read VR_$p1;do ";;
 		STRGET) ebgf "while test -n \"\${VR_$p1}\";do ";;
