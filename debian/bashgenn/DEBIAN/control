@@ -1,0 +1,9 @@
+Package: bashgenn
+Version: 10
+Architecture: all
+Maintainer: romw314
+Installed-Size: 13
+Depends: bash
+Section: devel
+Priority: optional
+Description: The BASH script GENerator for text maNipulation

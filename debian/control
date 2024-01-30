@@ -1,0 +1,10 @@
+Source: bashgenn
+Section: devel
+Priority: optional
+Maintainer: romw314
+Build-Depends: debhelper (>= 9)
+
+Package: bashgenn
+Architecture: all
+Depends: bash
+Description: The BASH script GENerator for text maNipulation

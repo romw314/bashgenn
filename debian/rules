@@ -1,0 +1,16 @@
+#!/usr/bin/make -f
+
+clean:
+	@# Do nothing
+
+build:
+	@# Do nothing
+
+binary:
+	mkdir -p debian/bashgenn
+	mkdir -p debian/bashgenn/usr/bin
+	cp bashgenn debian/bashgenn/usr/bin/bashgenn
+	dh_gencontrol
+	dh_builddeb
+
+.PHONY: clean build binary
