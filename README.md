@@ -1,3 +1,5 @@
+<!--
+
 # BASHGENN IS DEPRECATED: [RBGN](https://github.com/romw314/rust-bashgenn) IS A MODERN ALTERNATIVE TO BASHGENN. IF YOU STILL NEED TO USE BASHGENN, TRY TO WRITE SCRIPTS WITHOUT ANY BASHGENN-SPECIFIC COMMANDS!
 
 RBGN is a new, cross-platform and modern Bashgenn interpreter written in Rust. RBGN is currently in development and if you need Bashgenn-specific features, use Bashgenn. **YOU SHOULD NOT USE BASHGENN IF RBGN CAN RUN YOUR SCRIPT PROPERLY.**
@@ -20,13 +22,27 @@ To get help about RBGN, run this command:
 rbgn --help
 ```
 
+-->
+
 # Bashgenn
 
 Bashgenn - the ***Bash*** script ***gen***erator for text ma***n***iputaion
 
 ## Installation
 
-Currently, Bashgenn can be installed by cloning this repo and adding the `bashgenn` script to your PATH:
+Bashgenn can be installed from RAPR (Debian/Ubuntu only, make sure you have [RAPR](https://romw314.github.io/rapr.html) setup first):
+
+```sh
+sudo apt-get install bashgenn
+```
+
+On other operating systems, use the install script:
+
+```sh
+curl -s https://tinyurl.com/bginst3-linux | bash
+```
+
+Bashgenn can also be installed by cloning this repo and adding the `bashgenn` script to your PATH:
 
 ```sh
 git clone https://github.com/romw314/bashgenn
