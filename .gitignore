@@ -1,1 +1,5 @@
 bg-f
+/debian/bashgenn
+*.debhelper.log
+/debian/*.substvars
+/debian/files
