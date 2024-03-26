@@ -163,7 +163,7 @@ while read cmd p1 p2; do
 		echo "Processing $esc[36m$cmd$esc[0m at line $line..."
 	fi
 	case "$cmd" in
-		CONST_SET|CONSTSET|USE|EXPORT|-*) :;;
+		CONST_SET|CONSTSET|USE|CALL|-*) :;;
 		*)
 			if test -n "$(echo "$cmd $p1 $p2" | tr -d ' a-zA-Z0-9_-')"; then
 				nostrict "line $line: command contains invalid characters"
@@ -206,8 +206,8 @@ while read cmd p1 p2; do
 		SAMENUMDEC) ebgf "let VR_$p1--;";;
 
 		# Functions
-		FUNC) no_mod && depr "$line" "$cmd" "Bashgenn modules (EXPORT)" && ebgf "$newline$func_id$p1() { ";;
-		CALL) no_mod && depr "$line" "$cmd" "Bashgenn modules (USE)" && ebgf "$func_id$p1;";;
+		FUNC) no_mod && depr "$line" "$cmd" "Bashgenn modules (EXPORT)" && ebgf "$newline$func_id$namespace$p1() { ";;
+		CALL) no_mod && depr "$line" "$cmd" "Bashgenn modules (USE)" && ebgf "$func_id$namespace$p1;";;
 		ENDFUNC) ebgfnl "}";;
 
 		# IReq runtime commands
@@ -223,8 +223,13 @@ while read cmd p1 p2; do
 		# Modules
 		MODULE) no_mod && modules_enabled="true" && mod_check "$p1" "name" && module="$p1";;
 		IMPORT) if_mod && echo "Compiling $esc[36m$p1$esc[0m..." && ebgfnl " $(addmod "$(findmod "$p1")")";;
-		EXPORT) if_mod && mod_check "$p1" && ebgf "$newline$bgmod$module.$p1() { ";;
+		EXPORT) if_mod && mod_check "$p1" && ebgf "$newline$bgmod$module.$namespace$p1() { ";;
 		USE) if_mod && mod_check "$p1" && ebgf "$bgmod$p1;";;
+
+		# Special commands
+		NAMESPACE) namespace="$namespace$p1.";;
+		ENDNAMESPACE) namespace="$(awk <<< "${namespace:0:$(( ${#namespace} - 1 ))}" '{split($0,a,".");delete a[length(a)];j="";for(i=1;i<=length(a);i++)j=(j?j "." a[i]:a[i]);print j}').";;
+		EN) echo "$namespace";;
 
 		# Compiler directives
 		_MSG)  [ -n "$p2" ] && p2=" $p2"; echom "_MSG: '$p1$p2'";;
@@ -239,6 +244,9 @@ while read cmd p1 p2; do
 		_*) error "$cmd: invalid compiler directive";;
 		*) error "$cmd: invalid command";;
 	esac
+	if [ "$namespace" = "." ]; then
+		namespace=""
+	fi
 done
 
 echo "Making bg-f executable..."
