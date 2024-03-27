@@ -10,12 +10,12 @@ blocks:
       jobs:
         - name: 'Job #1'
           commands:
-            - ./bg-f < in.txt | tee out.txt
+            - bash -x bg-f < in.txt | tee out.txt
             - '[ "$(rev in.txt)" = "$(cat out.txt)" ]'
           parallelism: 4
         - name: 'Job #2'
           commands:
-            - rev in.txt | ./bg-f | tee out.txt
+            - rev in.txt | bash -x bg-f | tee out.txt
             - '[ "$(cat in.txt)" = "$(cat out.txt)" ]'
           parallelism: 4
       prologue:
@@ -37,5 +37,5 @@ blocks:
       jobs:
         - name: 'Job #1'
           commands:
-            - ./bg-f > out.txt
+            - bash -x bg-f > out.txt
             - '[ "$(cat out.txt)" = "Hello World!" ]'
