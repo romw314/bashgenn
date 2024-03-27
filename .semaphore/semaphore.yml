@@ -5,7 +5,7 @@ agent:
     type: e1-standard-2
     os_image: ubuntu2004
 blocks:
-  - name: Test scripts
+  - name: Reverse
     task:
       jobs:
         - name: 'Job #1'
@@ -22,13 +22,22 @@ blocks:
             - rev in.txt | ./bg-f > out.txt
             - '[ "$(cat in.txt)" = "$(cat out.txt)" ]'
           parallelism: 4
-        - name: 'Job #3'
-          commands:
-            - ./bashgenn examples/hello_world.bgn
-            - ./bg-f > out.txt
-            - '[ "$(cat out.txt)" = "Hello World!" ]'
       prologue:
         commands:
           - checkout
+          - cat examples/reverse.bgn | sed -e 's/STRGET forever/STRGET forever\nALLOW_UNDEF\nCONST_WRITE anuc forever/' -e 's/<<//' -e 's/>>//' | bashgenn
     run:
       when: change_in('/bashgenn') OR change_in('/examples/')
+    dependencies: []
+  - name: 'Hello, World!'
+    dependencies: []
+    task:
+      prologue:
+        commands:
+          - checkout
+          - ./bashgenn examples/hello_world.bgn
+      jobs:
+        - name: 'Job #1'
+          commands:
+            - ./bg-f > out.txt
+            - '[ "$(cat out.txt)" = "Hello World!" ]'
