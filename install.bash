@@ -12,7 +12,11 @@ curl -sO https://h10.ngw1.rf.gd/rbindb/figlet-2.2.5/fonts/big.flf
 chmod 700 figlet
 chmod 600 big.flf
 figlet_dir="$(pwd)"
-figlet() { FIGLET_FONTDIR="$figlet_dir" "$figlet_dir"/figlet -f big.flf "$@"; }
+figlet() {
+	if ! FIGLET_FONTDIR="$figlet_dir" "$figlet_dir"/figlet -f big.flf "$@" 2>/dev/null; then
+		echo "$@"
+	fi
+}
 
 ask() {
 	if [ -z "$askfirst" ]; then
