@@ -23,7 +23,8 @@ blocks:
           - checkout
           - sed examples/reverse.bgn -e 's/STRGET forever/STRGET forever\nALLOW_UNDEF\nCONST_WRITE anuc forever/' -e 's/<<//' -e 's/>>//' | tee reverse_one.bgn
           - ./bashgenn reverse_one.bgn
-          - openssl rand 256 | base64 -w0 | tee in.txt
+          - openssl rand -base64 256 | sed -z 's/\n//g' | tee in.txt
+          - echo >> in.txt
     run:
       when: change_in('/bashgenn') OR change_in('/examples/')
     dependencies: []
