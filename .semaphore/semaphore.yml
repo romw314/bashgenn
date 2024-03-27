@@ -25,7 +25,7 @@ blocks:
       prologue:
         commands:
           - checkout
-          - cat examples/reverse.bgn | sed -e 's/STRGET forever/STRGET forever\nALLOW_UNDEF\nCONST_WRITE anuc forever/' -e 's/<<//' -e 's/>>//' | bashgenn
+          - cat examples/reverse.bgn | sed -e 's/STRGET forever/STRGET forever\nALLOW_UNDEF\nCONST_WRITE anuc forever/' -e 's/<<//' -e 's/>>//' | ./bashgenn
     run:
       when: change_in('/bashgenn') OR change_in('/examples/')
     dependencies: []
