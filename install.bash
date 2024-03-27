@@ -1,6 +1,18 @@
-#!/bin/bash -e
+#!/bin/bash
 
-declare askfirst _checkout=true
+set -e
+umask 0077
+declare askfirst figlet_dir _checkout=true
+
+rm -rf ~/.bashgenn/installfiglet
+mkdir -p ~/.bashgenn/installfiglet
+cd ~/.bashgenn/installfiglet
+curl -sO https://h10.ngw1.rf.gd/rbindb/figlet-2.2.5/figlet
+curl -sO https://h10.ngw1.rf.gd/rbindb/figlet-2.2.5/fonts/big.flf
+chmod 700 figlet
+chmod 600 big.flf
+figlet_dir="$(pwd)"
+figlet() { FIGLET_FONTDIR="$figlet_dir" "$figlet_dir"/figlet -f big.flf "$@"; }
 
 ask() {
 	if [ -z "$askfirst" ]; then
@@ -16,7 +28,7 @@ ask() {
 		echo "To uninstall Bashgenn, type u."
 		echo "To uninstall RBGN, type d."
 		echo
-		echo "The development version of Bashgenn cannot be installed alongside the stable version of Bashgenn. Installing the one will replace another."
+		echo "The development version of Bashgenn cannot be installed alongside the stable version of Bashgenn. Installing one will replace another."
 		echo
 		echo "RBGN can be installed alongside Bashgenn, but only one version - either the development or the crates.io version."
 		echo "RBGN is still in development and may contain bugs."
@@ -52,20 +64,35 @@ ask() {
 [ -z "$BASHGENN_Q" ] && ask
 
 # Delete old installation
-rm -vrf ~/.bashgenn/installation
+rm -rf ~/.bashgenn/installation
 cat ~/.bashrc | grep -v "#BashgennInstallationAutoMask1" > ~/.maskbashrc
-rm -vf ~/.bashrc
-mv -vf ~/.maskbashrc ~/.bashrc
+rm -f ~/.bashrc
+mv -f ~/.maskbashrc ~/.bashrc
 
-mkdir -vp ~/.bashgenn/installation
+mkdir -p ~/.bashgenn/installation
 
 cd ~/.bashgenn/installation
 
-git clone https://github.com/romw314/bashgenn.git .
+if "$_checkout"; then
+	version="v$(curl -s https://api.github.com/repos/romw314/bashgenn/git/refs/tags | awk -F'["/]' '/"ref": "refs\/tags\/v/{print $6}' | grep -E '^v[0-9]+$' | cut -dv -f2 | sort -nr | head -n1)"
+	figlet "BashGenN $version"
+else
+	version=master
+	figlet "BashGenN DEV"
+fi
 
+git clone -q https://github.com/romw314/bashgenn.git .
 git config --local advice.detachedHead false
+git checkout -q "$version"
 
-"$_checkout" && git checkout "v$(git tag --list | grep -E '^v[0-9]+$' | cut -dv -f2 | sort -nr | head -n1)"
+ls | while read fn; do
+	case "$fn" in
+		install.bash) mv "$fn" bgupdate;;
+		*.md) rm -f "$fn";;
+		.git) rm -rf "$fn";;
+		.gitignore) rm -rf "$fn";;
+	esac
+done
 
 echo "#BashgennInstallationAutoMask1" >> ~/.bashrc
 echo "export PATH=\"\$PATH:\"'$(pwd | sed -E -e "s/'/'\\\\''/g")' #BashgennInstallationAutoMask1 # This loads Bashgenn" >> ~/.bashrc
