@@ -10,14 +10,12 @@ blocks:
       jobs:
         - name: 'Job #1'
           commands:
-            - echo "$(openssl rand -base64 4096)" > in.txt
-            - ./bg-f < in.txt > out.txt
+            - ./bg-f < in.txt | tee out.txt
             - '[ "$(rev in.txt)" = "$(cat out.txt)" ]'
           parallelism: 4
         - name: 'Job #2'
           commands:
-            - echo "$(openssl rand -base64 4096)" > in.txt
-            - rev in.txt | ./bg-f > out.txt
+            - rev in.txt | ./bg-f | tee out.txt
             - '[ "$(cat in.txt)" = "$(cat out.txt)" ]'
           parallelism: 4
       prologue:
@@ -25,6 +23,7 @@ blocks:
           - checkout
           - sed examples/reverse.bgn -e 's/STRGET forever/STRGET forever\nALLOW_UNDEF\nCONST_WRITE anuc forever/' -e 's/<<//' -e 's/>>//' | tee reverse_one.bgn
           - ./bashgenn reverse_one.bgn
+          - echo "$(openssl rand -base64 4096)" | tee in.txt
     run:
       when: change_in('/bashgenn') OR change_in('/examples/')
     dependencies: []
