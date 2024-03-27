@@ -1,0 +1,34 @@
+version: v1.0
+name: Initial Pipeline
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu2004
+blocks:
+  - name: Test scripts
+    task:
+      jobs:
+        - name: 'Job #1'
+          commands:
+            - ./bashgenn examples/reverse.bgn
+            - echo "$(openssl rand -base64 4096)" > in.txt
+            - ./bg-f < in.txt > out.txt
+            - '[ "$(rev in.txt)" = "$(cat out.txt)" ]'
+          parallelism: 4
+        - name: 'Job #2'
+          commands:
+            - ./bashgenn examples/reverse.bgn
+            - echo "$(openssl rand -base64 4096)" > in.txt
+            - rev in.txt | ./bg-f > out.txt
+            - '[ "$(cat in.txt)" = "$(cat out.txt)" ]'
+          parallelism: 4
+        - name: 'Job #3'
+          commands:
+            - ./bashgenn examples/hello_world.bgn
+            - ./bg-f > out.txt
+            - '[ "$(cat out.txt)" = "Hello World!" ]'
+      prologue:
+        commands:
+          - checkout
+    run:
+      when: change_in('/bashgenn') OR change_in('/examples/')
