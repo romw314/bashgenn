@@ -97,7 +97,7 @@ ECHO our_variable
 ECHO our_variable
 ```
 
-And if we want to write the text 500 times? Should we add the `ECHO` command 500 times? No! The `REPEAT` commands is designed for that:
+And if we want to write the text 500 times? Should we add the `ECHO` command 500 times? No! The `REPEAT` command is designed for that:
 
 ```
 READ our_variable
@@ -115,7 +115,7 @@ ECHO our_variable
 ECHO another_variable
 ```
 
-Now, it's time for a practice. Adapt the code above to write the two lines in reversed order. When we enter this input:
+Now, it's time for practice. Adapt the code above to write the two lines in reversed order. When we enter this input:
 
 ```
 Hello
