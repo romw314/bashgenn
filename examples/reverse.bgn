@@ -22,7 +22,7 @@ CONST_WRITE any_char forever
 
 - STRGET is a loop. In bashgenn, loops are ended with DONE.
 - The STRGET loop repeats the commands inside the loop while the string in the variable specified is not an empty string.
-- Our variable name is forever. This STRGET loop will repeat the commands forever.
+- Our variable name is forever. This STRGET loop will repeat commands forever.
 STRGET forever
 	NONL input
 	READ text
