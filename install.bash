@@ -92,7 +92,7 @@ git checkout -q "$version"
 ls | while read fn; do
 	case "$fn" in
 		install.bash) mv "$fn" bgupdate;;
-		*.md) rm -f "$fn";;
+		*.md|*.sh|*.bash) rm -f "$fn";;
 		.git) rm -rf "$fn";;
 		.gitignore) rm -rf "$fn";;
 	esac
