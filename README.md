@@ -182,6 +182,7 @@ PROG_INIT
 Next, we'll try to reverse a string (for example `olleh` from `hello`):
 ```
 - This script is slow because we reverse the string character by character.
+PROG_INIT
 
 - Initialize variables
 DECLARE last
