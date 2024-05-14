@@ -31,6 +31,8 @@ Bashgenn - the ***Bash*** script ***gen***erator for text ma***n***iputaion.
 Bashgenn is a simple programming language for text manipulation.
 
 [![Replit](https://img.shields.io/badge/Replit-template-green?style=for-the-badge&logo=replit)](https://replit.com/@romw314/Bashgenn?v=1#main.bgn)
+[![License](https://img.shields.io/github/license/romw314/bashgenn?style=for-the-badge)
+](https://github.com/romw314/bashgenn/tree/master?tab=Unlicense-1-ov-file)
 
 ## Installation
 
