@@ -30,6 +30,8 @@ Bashgenn - the ***Bash*** script ***gen***erator for text ma***n***iputaion.
 
 Bashgenn is a simple programming language for text manipulation.
 
+[![Replit](https://img.shields.io/badge/Replit-template-green?style=for-the-badge&logo=replit)](https://replit.com/@romw314/Bashgenn?v=1#main.bgn)
+
 ## Installation
 
 Bashgenn can be installed from RAPR (Debian/Ubuntu only, make sure you have [RAPR](https://romw314.github.io/rapr.html) set up first):
