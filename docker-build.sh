@@ -86,7 +86,7 @@ fi
 
 readonly dryrun all
 
-readonly latestver="v$(git tag --list | grep -E 'v[0-9]+' | cut -dv -f2 | sort -n | head -n1)"
+readonly latestver="v$(git tag --list | grep -E 'v[0-9]+' | cut -dv -f2 | sort -nr | head -n1)"
 
 declare -a images
 
