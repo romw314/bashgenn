@@ -106,6 +106,8 @@ for variant in debian alpine; do
 
 		tagname="$version-${variantver["$variant"]}"
 
+		images+=("$imgname:$tagname")
+
 		if [ ! "$all" = "true" ] && docker image ls "$imgname" --format '{{.Tag}}' | awk -v tag="$tagname" '$0==tag{print "skip"}' | grep -q skip; then
 			echo "Skipped $imgname:$tagname."
 			continue
@@ -116,8 +118,6 @@ for variant in debian alpine; do
 			--build-arg BASHGENN_VERSION="$version" \
 			--build-arg BASE="${base["$variant"]}" \
 			.
-
-		images+=("$imgname:$tagname")
 
 		case "$variant" in
 			debian) docker_tag "$imgname:$tagname" "$imgname:$version";;
